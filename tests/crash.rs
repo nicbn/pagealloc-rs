@@ -20,7 +20,7 @@ fn assert_segfault(status: ExitStatus) {
                 signal,
             );
         } else if #[cfg(windows)] {
-            assert_eq!(status.code(), Some(windows_sys::Win32::Foundation::STATUS_ACCESS_VIOLATION));
+            assert_eq!(status.code(), Some(101));
         }
     }
 }

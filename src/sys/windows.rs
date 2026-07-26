@@ -1,7 +1,7 @@
 use crate::{Error, OsError, Protection, Result};
 use core::ffi::c_void;
 use core::mem::MaybeUninit;
-use core::ptr::{self, NonNull};
+use core::ptr::NonNull;
 use windows_sys::Win32;
 
 pub type RawOsError = i32;
