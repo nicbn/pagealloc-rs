@@ -162,7 +162,7 @@ pub unsafe fn alloc(location: *mut u8, size: usize, protection: Protection) -> R
     let alloc_granularity = alloc_granularity();
     if (!location.is_null() && location.align_offset(alloc_granularity) != 0)
         || size == 0
-        || !size.is_multiple_of(alloc_granularity)
+        || !is_multiple_of(size, alloc_granularity)
     {
         return Err(Error::InvalidInput);
     }
@@ -193,9 +193,9 @@ pub unsafe fn alloc(location: *mut u8, size: usize, protection: Protection) -> R
 ///   memory range reserved via [`alloc`].
 ///
 /// Undefined behavior if `location + size` overflows.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// # (|| -> pagealloc::Result<()> {
 /// let ptr = unsafe {
@@ -212,7 +212,7 @@ pub unsafe fn alloc(location: *mut u8, size: usize, protection: Protection) -> R
 /// ```
 pub unsafe fn dealloc(location: NonNull<u8>, size: usize) -> Result<()> {
     let alloc_granularity = alloc_granularity();
-    if location.align_offset(alloc_granularity) != 0 || !size.is_multiple_of(alloc_granularity) {
+    if location.align_offset(alloc_granularity) != 0 || !is_multiple_of(size, alloc_granularity) {
         return Err(Error::InvalidInput);
     }
 
@@ -222,12 +222,12 @@ pub unsafe fn dealloc(location: NonNull<u8>, size: usize) -> Result<()> {
 /// Recommit a range of pages, such that they remain allocated and return zero when accessed.
 ///
 /// It is only portable to call this on ranges of memory that were allocated with [`alloc`].
-/// 
+///
 /// # Platform-specific behavior
-/// 
+///
 /// On Windows, this function will return an error if the memory range was not allocated with
 /// [`alloc`].
-/// 
+///
 /// # Errors
 ///
 /// Returns [`Error::InvalidInput`] if:
@@ -239,9 +239,9 @@ pub unsafe fn dealloc(location: NonNull<u8>, size: usize) -> Result<()> {
 /// This must be a valid range of memory.
 ///
 /// Undefined behavior if `location + size` overflows.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// # (|| -> pagealloc::Result<()> {
 /// # let ptr = unsafe {
@@ -262,7 +262,7 @@ pub unsafe fn dealloc(location: NonNull<u8>, size: usize) -> Result<()> {
 /// ```
 pub unsafe fn clear(location: NonNull<u8>, size: usize, protection: Protection) -> Result<()> {
     let page_size = page_size();
-    if location.align_offset(page_size) != 0 || !size.is_multiple_of(page_size) {
+    if location.align_offset(page_size) != 0 || !is_multiple_of(size, page_size) {
         return Err(Error::InvalidInput);
     }
 
@@ -270,7 +270,7 @@ pub unsafe fn clear(location: NonNull<u8>, size: usize, protection: Protection) 
 }
 
 /// Change the protection of a range of pages.
-/// 
+///
 /// # Errors
 ///
 /// Returns [`Error::InvalidInput`] if:
@@ -304,7 +304,7 @@ pub unsafe fn clear(location: NonNull<u8>, size: usize, protection: Protection) 
 #[inline]
 pub unsafe fn protect(location: NonNull<u8>, size: usize, protection: Protection) -> Result<()> {
     let page_size = page_size();
-    if location.align_offset(page_size) != 0 || !size.is_multiple_of(page_size) {
+    if location.align_offset(page_size) != 0 || !is_multiple_of(size, page_size) {
         return Err(Error::InvalidInput);
     }
 
@@ -329,7 +329,7 @@ pub unsafe fn protect(location: NonNull<u8>, size: usize, protection: Protection
 /// This must be a valid range of memory.
 ///
 /// Undefined behavior if `location + size` overflows.
-/// 
+///
 /// # Examples
 ///
 /// ```
@@ -351,9 +351,17 @@ pub unsafe fn protect(location: NonNull<u8>, size: usize, protection: Protection
 #[inline]
 pub unsafe fn advise_free(location: NonNull<u8>, size: usize) -> Result<()> {
     let page_size = page_size();
-    if location.align_offset(page_size) != 0 || !size.is_multiple_of(page_size) {
+    if location.align_offset(page_size) != 0 || !is_multiple_of(size, page_size) {
         return Err(Error::InvalidInput);
     }
 
     unsafe { sys::advise_free(location, size) }
+}
+
+/// usize::is_multiple_of is only stable after Rust 1.87 which is higher than current
+/// minimum supported version.
+#[inline(always)]
+#[allow(clippy::manual_is_multiple_of)]
+fn is_multiple_of(left: usize, right: usize) -> bool {
+    left % right == 0
 }
