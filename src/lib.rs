@@ -221,13 +221,6 @@ pub unsafe fn dealloc(location: NonNull<u8>, size: usize) -> Result<()> {
 
 /// Recommit a range of pages, such that they remain allocated and return zero when accessed.
 ///
-/// It is only portable to call this on ranges of memory that were allocated with [`alloc`].
-///
-/// # Platform-specific behavior
-///
-/// On Windows, this function will return an error if the memory range was not allocated with
-/// [`alloc`].
-///
 /// # Errors
 ///
 /// Returns [`Error::InvalidInput`] if:
