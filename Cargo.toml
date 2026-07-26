@@ -1,0 +1,35 @@
+[package]
+name = "pagealloc"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.87.0"
+
+license = "MIT OR Apache-2.0"
+description = "Low-level, cross-platform page allocation library"
+repository = "https://github.com/nicbn/pagealloc"
+categories = ["memory-management"]
+keywords = ["mmap", "memory", "virtual"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["std"]
+buffer = []
+std = []
+
+[dependencies]
+cfg-if = "1.0.0"
+
+[target.'cfg(unix)'.dependencies]
+errno = { version = "0.3.1", default-features = false }
+libc = { version = "0.2.126", default-features = false }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.36.1", features = [
+    "Win32_Foundation",
+    "Win32_System_Diagnostics_Debug",
+    "Win32_System_Memory",
+    "Win32_System_SystemInformation",
+] }
