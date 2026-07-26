@@ -20,14 +20,14 @@ buffer = []
 std = []
 
 [dependencies]
-cfg-if = "1.0.0"
+cfg-if = "1.0.4"
 
 [target.'cfg(unix)'.dependencies]
-errno = { version = "0.3.1", default-features = false }
-libc = { version = "0.2.126", default-features = false }
+errno = { version = "0.3.14", default-features = false }
+libc = { version = "0.2.189", default-features = false }
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.36.1", features = [
+windows-sys = { version = "0.61.2", features = [
     "Win32_Foundation",
     "Win32_System_Diagnostics_Debug",
     "Win32_System_Memory",
