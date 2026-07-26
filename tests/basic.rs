@@ -83,17 +83,16 @@ fn alloc_write_advise_free_dealloc() {
 }
 
 #[test]
-#[cfg(not(windows))]
 fn clear_buffer() {
     #[repr(align(4096))]
-    struct Buffer([u8; 4096]);
+    struct Buffer([u8; 8192]);
 
     if pagealloc::page_size() != 4096 {
         eprintln!("page size is not 4096, skip test");
         return;
     }
 
-    let mut buffer = Buffer([1; 4096]);
+    let mut buffer = Buffer([1; 8192]);
     unsafe {
         pagealloc::clear(
             ptr::NonNull::new(buffer.0.as_mut_ptr()).unwrap(),
@@ -105,10 +104,12 @@ fn clear_buffer() {
     for i in 0..4096 {
         assert_eq!(buffer.0[i], 0);
     }
+    for i in 4096..8192 {
+        assert_eq!(buffer.0[i], 1);
+    }
 }
 
 #[test]
-#[cfg(not(windows))]
 fn clear_buffer_misaligned() {
     #[repr(align(4096))]
     struct Buffer([u8; 8192]);

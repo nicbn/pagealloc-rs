@@ -1,6 +1,6 @@
 #![cfg(feature = "buffer")]
 
-use pagealloc::alloc_granularity;
+use pagealloc::{alloc_granularity, page_size};
 
 #[test]
 fn read_only() {
@@ -59,13 +59,17 @@ fn protect() {
 fn clear() {
     let alloc_granularity = alloc_granularity();
     let size = 100 * alloc_granularity;
+    let page_size = page_size();
     let mut buf =
         pagealloc::buffer::ByteBuffer::new(size, pagealloc::Protection::ReadWrite).unwrap();
     buf.get_mut().fill(1);
-    buf.clear(0..alloc_granularity, pagealloc::Protection::ReadWrite)
+    buf.clear(0..page_size, pagealloc::Protection::ReadWrite)
         .unwrap();
-    for i in 0..alloc_granularity {
+    for i in 0..page_size {
         assert_eq!(buf.get()[i], 0);
+    }
+    for i in page_size..100 * alloc_granularity {
+        assert_eq!(buf.get()[i], 1);
     }
 }
 
@@ -75,9 +79,10 @@ fn protect_misaligned() {
     let size = 100 * alloc_granularity;
     let mut buf =
         pagealloc::buffer::ByteBuffer::new(size, pagealloc::Protection::ReadWrite).unwrap();
-    assert!(buf
-        .protect(1..alloc_granularity, pagealloc::Protection::Read)
-        .is_err());
+    assert!(
+        buf.protect(1..alloc_granularity, pagealloc::Protection::Read)
+            .is_err()
+    );
 }
 
 #[test]

@@ -37,7 +37,7 @@ pub unsafe fn clear(start: NonNull<u8>, size: usize, protection: Protection) -> 
     unsafe {
         if Win32::System::Memory::VirtualFree(
             start.as_ptr() as *mut c_void,
-            0,
+            size,
             Win32::System::Memory::MEM_DECOMMIT,
         ) != 0
             && !Win32::System::Memory::VirtualAlloc(
