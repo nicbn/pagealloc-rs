@@ -131,3 +131,46 @@ fn clear_buffer_misaligned() {
         .is_err()
     );
 }
+
+#[test]
+fn advise_free_buffer() {
+    #[repr(align(4096))]
+    struct Buffer([u8; 8192]);
+
+    if pagealloc::page_size() != 4096 {
+        eprintln!("page size is not 4096, skip test");
+        return;
+    }
+
+    let mut buffer = Buffer([1; 8192]);
+    unsafe { pagealloc::advise_free(ptr::NonNull::new(buffer.0.as_mut_ptr()).unwrap(), 4096) }
+        .unwrap();
+    for i in 0..4096 {
+        assert!(buffer.0[i] == 0 || buffer.0[i] == 1);
+    }
+    for i in 4096..8192 {
+        assert_eq!(buffer.0[i], 1);
+    }
+}
+
+#[test]
+fn advise_free_buffer_misaligned() {
+    #[repr(align(4096))]
+    struct Buffer([u8; 8192]);
+
+    if pagealloc::page_size() != 4096 {
+        eprintln!("page size is not 4096, skip test");
+        return;
+    }
+
+    let mut buffer = Buffer([1; 8192]);
+    assert!(
+        unsafe {
+            pagealloc::advise_free(
+                ptr::NonNull::new(buffer.0.as_mut_ptr()).unwrap().add(10),
+                4096,
+            )
+        }
+        .is_err()
+    );
+}
