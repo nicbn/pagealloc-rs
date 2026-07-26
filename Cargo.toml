@@ -1,12 +1,12 @@
 [package]
 name = "pagealloc"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 rust-version = "1.87.0"
 
 license = "MIT OR Apache-2.0"
 description = "Low-level, cross-platform page allocation library"
-repository = "https://github.com/nicbn/pagealloc"
+repository = "https://github.com/nicbn/pagealloc-rs"
 categories = ["memory-management"]
 keywords = ["mmap", "memory", "virtual"]
 

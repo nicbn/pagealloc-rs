@@ -2,6 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/pagealloc.svg)](https://crates.io/crates/pagealloc)
 [![docs.rs](https://docs.rs/pagealloc/badge.svg)](https://docs.rs/pagealloc)
+[![CI](https://github.com/nicbn/pagealloc-rs/actions/workflows/build_and_test.yaml/badge.svg)](https://github.com/nicbn/pagealloc-rs/actions/workflows/build_and_test.yaml)
 
 Low-level, cross-platform page allocation library.
 
